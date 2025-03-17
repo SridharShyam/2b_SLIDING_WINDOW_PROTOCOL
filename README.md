@@ -16,73 +16,65 @@ To write a python program to perform sliding window protocol
 ### server:
 ```python
 import socket
+
 s = socket.socket()
 s.bind(('localhost', 9999))
 s.listen(1)
-print("Server listening...")
+print("Server waiting for connection...")
+
 conn, addr = s.accept()
 print(f"Connected to {addr}")
 
 while True:
-    frames = conn.recv(1024).decode()
+    frames = conn.recv(1024).decode()  # Receive frames
     if not frames:
         break
+    print(f"Received: {frames}")
 
-    print(f"Received frames: {frames}")
-    ack_message = f"ACK for frames: {frames}"
-    conn.send(ack_message.encode())
+    ack = f"ACK for {frames}"  # Send acknowledgment
+    conn.send(ack.encode())
 
-conn.close()  
-s.close()  
+conn.close()
+s.close()
+  
 ```
 
 ### client:
 ```python
 import socket
+
 c = socket.socket()
 c.connect(('localhost', 9999))
-size = int(input("Enter number of frames to send: "))
-l = list(range(size))  
-print("Total frames to send:", len(l))
-s = int(input("Enter Window Size: "))
-i = 0
-while True:
-    while i < len(l):
-        st = i + s
-        frames_to_send = l[i:st]  
-        print(f"Sending frames: {frames_to_send}")
-        c.send(str(frames_to_send).encode())  
 
-        ack = c.recv(1024).decode()  
-        if ack:
-            print(f"Acknowledgment received: {ack}")
-            i += s  
-    break
-c.close()  
+# Get number of frames and window size
+size = int(input("Enter number of frames: "))
+window_size = int(input("Enter window size: "))
+
+frames = list(range(size))  # Frame numbers
+i = 0
+
+while i < size:
+    send_frames = frames[i:i + window_size]  # Sending window-sized frames
+    print(f"Sending frames: {send_frames}")
+    c.send(str(send_frames).encode())  # Send frames
+
+    ack = c.recv(1024).decode()  # Receive acknowledgment
+    print(f"Received: {ack}")
+
+    i += window_size  # Move window
+
+c.close()
 
 ```
 ## OUPUT
 
 ### server
-![Screenshot 2025-03-13 103808](https://github.com/user-attachments/assets/f6ac4127-2754-4133-b70d-6e2c2ee01363)
+![image](https://github.com/user-attachments/assets/84c04f19-c06e-4328-89f5-f86fb7233290)
 
-
-
-
-
-
-
-
-.
 
 ### client
-![Screenshot 2025-03-13 103816](https://github.com/user-attachments/assets/36358ef9-3c0f-400e-a98c-cb80c329a3ed)
+![image](https://github.com/user-attachments/assets/bb5bf23c-5cf1-4f67-b8c7-bee5ff8bf129)
 
-
-
-
-
-.
 
 ## RESULT
 Thus, python program to perform stop and wait protocol was successfully executed
